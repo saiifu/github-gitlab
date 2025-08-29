@@ -1,0 +1,327 @@
+\documentclass{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{xcolor}
+\usepackage{listings}
+
+\lstset{
+    language=bash,
+    basicstyle=\ttfamily\color{black},
+    keywordstyle=\color{blue},
+    stringstyle=\color{red},
+    commentstyle=\color{green}, % # and text both green
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    backgroundcolor=\color{lightgray!20},
+    frame=single
+}
+
+\begin{document}
+
+\section{Initial-Git}
+Initialize git on your machine:
+\begin{lstlisting}
+git init
+\end{lstlisting}
+
+\vspace{1cm}
+
+\section{Basic-Git}
+Some basic git commands:
+\begin{lstlisting}
+git add . # add unstaged file to staged
+git restore <filename> # restore staged file to unstaged
+git commit -m "Your_commit_message" # commit the staged file
+git push # push files
+\end{lstlisting}
+
+\section{Git Config}
+Configure commit history:
+\begin{lstlisting}
+# global
+git config --global user.name "your_name"
+git config --global user.email "your_email"
+# local
+git config --local user.name "your_name"
+git config --local user.email "your_email"
+# check config lists
+git config --global --list
+git config --local --list
+\end{lstlisting}
+Global configs are located here : \texttt{\~{}/.gitconfig} and the Local configs are located at the current directories: \texttt{.git/config}  
+\vspace{0.5cm}
+\hrule
+\vspace{0.5cm} 
+
+\section{Some Common Git Command}
+There are some common git commands which we use regularly
+\begin{lstlisting}
+git branch  #to check branches
+git status  #to check staged and unstaged
+git checkout  #changing branch 
+git log  #to check the commit history
+git checkout -b "branch_name"  #to create a new branch from main branch 
+\end{lstlisting}
+
+\section{SSH Keygen}
+SSH keygen is most important to connect the local server to the remote server. There are few steps to create SSH key and add it to the remote server . 
+\subsection{Create SSH key}
+		\begin{lstlisting}
+ssh-keygen -t rsa -b 2048 -C "comment"	
+		\end{lstlisting}
+This will show you a location where to save the ssh key .To save it on the default location \texttt{\~{}/.ssh/id\_rsa.pub} press ENTER, ENTER and ENTER . Here the \texttt{id\_rsa.pub} is your SSH public key. Open the key, copy it and add it to github settings SSH key section . 
+\subsection{Add To Remote}
+After adding the SSH key to remote , You can now connect your local machine to remote server. 
+\subsubsection{Cloning Github/Gitlab}
+Go to a particular directory where you want to clone the remote git 
+				\begin{lstlisting}
+git clone git@gitlab.com:group.project.git	
+				\end{lstlisting}
+\subsubsection{Add Remote and Push}
+On the other hand, you work in your local machine and now you want to add your project to remote
+				\begin{lstlisting}
+git remote add origin git@gitlab.com:group.project.git 
+				\end{lstlisting}
+
+\subsection{Now The Big Problem Arise}
+Suppose I have two GitHub accounts:
+\begin{itemize}
+	\item \texttt{git@github.com:user1/project1.git}
+	\item \texttt{git@github.com.user2/project2.git}	
+\end{itemize}
+Earlier you saw in the previous command that i also have a GitLab account. 
+\begin{itemize}
+	\item \texttt{git@gitlab.com:group.projetc.git}
+	
+\end{itemize}
+which i already connected to my local machine using SSH, and its public key is added in \texttt{id\_rsa.pub} . 
+Now i want to connect these two new GitHub account with SSH without any problem 
+\textbf{Procedure}
+\begin{lstlisting}
+#key generate for user1 
+ssh-keygen -t rsa -b 2048 -C "user1" -f ~/.ssh/id_rsa_user1
+#key generate for user2
+ssh-keygen -t rsa -b 2048 -C "user2" -f ~/.ssh.id_rsa_user2
+\end{lstlisting}
+Now there will be three key which are 
+\begin{itemize}
+	\item \texttt{\~/.ssh/id\_rsa.pub} which is for GitLab
+        \item \texttt{\~/.ssh/id\_rsa\_user1.pub} which is for GitHub user1 
+	\item \texttt{\~/.ssh/id\_rsa\_user2.pub} which is for GitHub user2	
+	
+\end{itemize}
+Open a config file and add these line in it:
+
+\begin{lstlisting}
+nano ~/.ssh/config #open config file
+\end{lstlisting}
+
+\begin{lstlisting}
+# GitLab account
+Host gitlab
+   HostName gitlab.com
+   User git
+   IdentityFile ~/.ssh/id_rsa
+
+# GitHub account user1
+Host github-user1
+   HostName github.com
+   User git
+   IdentityFile ~/.ssh/id_rsa_github_user1
+
+# GitHub account user2
+Host github-user2
+   HostName github.com
+   User git
+   IdentityFile ~/.ssh/id_rsa_github_user2
+
+\end{lstlisting}
+Check the HostName carefully, cause for git clone and git remote add you need to add this hostname properly. 
+Now open and copy the each SSH key and add them to their account 
+
+\begin{lstlisting}
+cat ~/.ssh/id_rsa.pub  #add it to GitLab account
+cat ~/.ssh/id_rsa_github_user1.pub  #add it to GitHub user1 account 
+cat ~/.ssh/id_rsa_github_user2.pub  #add it to GitHub user2 account 
+\end{lstlisting}
+
+Now you can clone them singley and also add them in remote . You will see the HostName of config file will add after git@ part . 
+
+\begin{lstlisting}
+#for GitLab the HosName was gitlab 
+git clone git@gitlab:group/project.git
+
+#for GitHub user1 the HostName was github-user1
+git clone git@github-user1:user1/project1.git
+
+#for GitHub user2 the HostName was github-user2
+git clone git@github-user2:user2/project2.git	
+\end{lstlisting}
+
+\begin{lstlisting}
+#for GitLab
+git remote add origin git@gitlab:group/project.git
+
+#for GitHub user1
+git remote add origin git@github-user1:user1/project1.git
+
+#for GitHub user2
+git remote add origin git@github-user2:user2/project2.git	
+\end{lstlisting}
+
+
+\section{Fork Git Branch, Edit and Merge Request}
+
+\textbf{Fork the main repository}
+\begin{lstlisting}
+git@gitlab.com/main/merge.git #suppose its the main repository
+git@gitlab.com/fork/merge.git #forked repository	
+\end{lstlisting}
+
+
+\textbf{Clone your fork which you added to your gitlab:} 
+\begin{lstlisting}
+git clone git@gitlab.com/fork/merge.git 
+cd merge	
+\end{lstlisting}
+Here origin is automatically set to your fork (git@gitlab.com/fork/merge.git). 
+
+
+\textbf{Add the main repository to upstream:}
+\begin{lstlisting}
+git remote add upstream git@gitlab.com/main/merge.git #upstream add
+git remote -v #check origin and upstream set 
+\end{lstlisting}
+
+
+\textbf{Create a new branch for your feature}
+\begin{lstlisting}
+git checkout -b new-branch
+\end{lstlisting}
+Always work on your feature branch , never directly on master.
+
+
+\textbf{After completing edit, add, commit, push your feature branch to your fork(origin)}
+\begin{lstlisting}
+git push origin new-branch 
+\end{lstlisting}
+
+
+It will create the branch in your remote fork.
+Then you need to create Merge Request to your fork master. 
+Whenever merging the branch, it will automatically delete the branch from your remote fork repository. 
+Then Create a Merge Request to the main repository from where you forked the repo.
+
+
+\textbf{Now there are some point: }
+\begin{itemize}
+	\item The commit history of main repository is ahead of your fork repository
+	\item The commit history of your fork repository is behind of your main repository
+	\item If you without doing anything try to push , it will shows conflict 
+\end{itemize}
+
+
+\textbf{Sync fork with main repository after Merge Request}
+\begin{lstlisting}
+git checkout master #comeback to the master
+git branch -d new-branch #delete feature branch
+git fetch upstream #fetch latest upstream change
+git rebase upstream/master #rebase  
+git push  #push updated master to your fork	
+\end{lstlisting}
+
+
+Now the commit history of your fork repository will be same as your main repository from where you forked it . 
+
+\section{Resolve Conflict when two or more person changing the same line}
+
+Its from the initial phase, you can also work on a existance directory. 
+Always create a feature branch and work on that. The scenerio is given below:
+In main repo there is a file1 and into the file the text is: 
+\begin{lstlisting}
+Hello,
+My Name is Git. 
+	
+\end{lstlisting}
+And you fork the repo and clone it your local machine and make a branch named \textbf{feature} edit the file like:
+\begin{lstlisting}
+Hello,
+My Name is Git. 
+And You are HTML 
+\end{lstlisting}
+So you add it and commit it. On the same time someone changed the main repo file1 like this:
+\begin{lstlisting}
+Hello,
+My Name is Git. 
+And You are HTML
+And you love javascript
+\end{lstlisting}
+Now if you want to push the file to remote fork as well as merge to the main. you will see some conflict issue. There is the procedure to resolve the conflict manually. 
+\textbf{Fetch upstream}
+\begin{lstlisting}
+git fetch upstream
+\end{lstlisting}
+\textbf{Checkout feature branch}
+\begin{lstlisting}
+git checkout feature
+\end{lstlisting}
+\textbf{rebase your branch}
+\begin{lstlisting}
+git rebase upstream/master 
+\end{lstlisting}
+You will see error like it:
+\begin{lstlisting}
+CONFLICT (content): Merge conflict in file1
+\end{lstlisting}
+Now open file1 and manually changed it: 
+\begin{lstlisting}
+#from this 
+<<<<<<< HEAD 
+Hello,
+My Name is Git. 
+And You are HTML
+________________
+----------------
+And you love javascript
+>>>>>> feature 
+
+#to that 
+Hello,
+My Name is Git. 
+And You are HTML
+And you love javascript #or however you want to do it
+\end{lstlisting}
+Now make conflict resolved and continue rebase . 
+\begin{lstlisting}
+git add file1
+git rebase --continue
+\end{lstlisting}
+Now You can push it 
+\begin{lstlisting}
+git push origin feature -f 	
+\end{lstlisting}
+
+Now from your fork feature branch you can add merge request and then delete
+them.
+And after doing these you should again do these things for make your local, fork and main repos commit history similiar so that if you want to do something there will be no problem occurs. Also do these things everytime before you work. All the procedure here. 
+\begin{lstlisting}
+git checkout feature
+git fetch upstream
+git fetch upstream/master
+git checkout master
+git push  
+git branch -d feature
+git push origin --delete feature 
+\end{lstlisting}
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
+
