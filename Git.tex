@@ -314,7 +314,51 @@ git push origin --delete feature
 \end{lstlisting}
 
 
+\subsection{Git Reset}
+We are using git reset using two types:
+\begin{itemize}
+	\item{Hard Reset}
+	\item{Soft Reset}	
+	
+\end{itemize}
+\begin{lstlisting}
+git reset --hard HEAD~2 #delete 2 commits
+git push --force
+	
+\end{lstlisting}
+Be careful. Hard Reset always use from the feature branch . Never use Hard reset from master or main branch. 
+From main branch, we can use \textbf{git revert}
+\begin{lstlisting}
+git rever commit-hash #which has you want to go 
+git push 	
+\end{lstlisting}
 
+\subsection{Merge and Update}
+Suppose my feature branch is behind from my master branch 
+\textbf{Checkout master}
+\begin{lstlisting}
+git checkout master 
+	
+\end{lstlisting}
+\textbf{Pull}
+\begin{lstlisting}
+git pull 
+	
+\end{lstlisting}
+\textbf{Checkout feature}
+\begin{lstlisting}
+git checkout feature
+	
+\end{lstlisting}
+\begin{lstlisting}
+git merge master 
+	
+\end{lstlisting}
+\textbf{Push}
+\begin{lstlisting}
+git push 
+	
+\end{lstlisting}
 
 
 
